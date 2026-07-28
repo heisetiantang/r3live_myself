@@ -1077,7 +1077,10 @@ char R3LIVE::cv_keyboard_callback()
     {
         scope_color( ANSI_COLOR_GREEN_BOLD );
         cout << "I capture the keyboard input!!!" << endl;
-        m_mvs_recorder.export_to_mvs( m_map_rgb_pts );
+        if ( m_if_record_mvs )
+        {
+            m_mvs_recorder.export_to_mvs( m_map_rgb_pts );
+        }
         // m_map_rgb_pts.save_and_display_pointcloud( m_map_output_dir, std::string("/rgb_pt"), std::max(m_pub_pt_minimum_views, 5) );
         m_map_rgb_pts.save_and_display_pointcloud( m_map_output_dir, std::string("/rgb_pt"), m_pub_pt_minimum_views  );
     }

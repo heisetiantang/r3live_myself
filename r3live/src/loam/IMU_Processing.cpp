@@ -120,10 +120,14 @@ void ImuProcess::lic_state_propagate( const MeasureGroup &meas, StatesGroup &sta
 // Avoid abnormal state input
 bool check_state( StatesGroup &state_inout )
 {
+    // The original 10 m/s limit is too low for vehicle datasets and corrupts
+    // otherwise valid states by resetting one velocity component to zero.
+    constexpr double kMaxVelocityComponent = 100.0;
     bool is_fail = false;
     for ( int idx = 0; idx < 3; idx++ )
     {
-        if ( fabs( state_inout.vel_end( idx ) ) > 10 )
+        if ( !std::isfinite( state_inout.vel_end( idx ) ) ||
+             fabs( state_inout.vel_end( idx ) ) > kMaxVelocityComponent )
         {
             is_fail = true;
             scope_color( ANSI_COLOR_RED_BG );

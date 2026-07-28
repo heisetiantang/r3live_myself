@@ -7,16 +7,19 @@ Lidar_front_end:
 
 r3live_common:
    if_dump_log: 0
-   record_offline_map: 1
+   # MVS recording retains extra per-frame data and is not needed for the
+   # colored point cloud saved with the R3LIVE control panel.
+   record_offline_map: 0
    map_output_dir: "/home/gjm/mountain_road_20260709/r3live_output"
    pub_pt_minimum_views: 3
-   minimum_pts_size: 0.01
+   # A 1 cm global RGB map grew to 9.48 million points in about 200 seconds.
+   minimum_pts_size: 0.05
    image_downsample_ratio: 1
    # Keep the supplied calibration fixed during the first comparison.
    estimate_i2c_extrinsic: 0
    estimate_intrinsic: 0
    maximum_vio_tracked_pts: 600
-   append_global_map_point_step: 4
+   append_global_map_point_step: 8
    maximum_image_buffer: 100
 
 r3live_vio:
@@ -39,7 +42,7 @@ r3live_vio:
    camera_ext_t: [-0.106514363944437, -0.065880929317533, 0.023206408754517]
 
 r3live_lio:
-   lio_update_point_step: 1
+   lio_update_point_step: 4
    max_iteration: 2
    lidar_time_delay: 0
    filter_size_corner: 0.30
