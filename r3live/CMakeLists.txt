@@ -122,7 +122,7 @@ target_link_libraries(r3live_mapping
                           pcl_common 
                           pcl_io) 
 
-FIND_PACKAGE(CGAL REQUIRED)
+FIND_PACKAGE(CGAL QUIET)
 if(CGAL_FOUND)
 	include_directories(${CGAL_INCLUDE_DIRS})
 	add_definitions(${CGAL_DEFINITIONS})

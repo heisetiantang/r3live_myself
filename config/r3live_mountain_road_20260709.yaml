@@ -1,0 +1,49 @@
+Lidar_front_end:
+   # The source enum is zero-based: HORIZON=1 handles Livox CustomMsg.
+   lidar_type: 1
+   N_SCANS: 6
+   using_raw_point: 1
+   point_step: 1
+
+r3live_common:
+   if_dump_log: 0
+   record_offline_map: 1
+   map_output_dir: "/home/gjm/mountain_road_20260709/r3live_output"
+   pub_pt_minimum_views: 3
+   minimum_pts_size: 0.01
+   image_downsample_ratio: 1
+   # Keep the supplied calibration fixed during the first comparison.
+   estimate_i2c_extrinsic: 0
+   estimate_intrinsic: 0
+   maximum_vio_tracked_pts: 600
+   append_global_map_point_step: 4
+   maximum_image_buffer: 100
+
+r3live_vio:
+   image_width: 1280
+   image_height: 720
+   camera_intrinsic:
+      [859.1093321707232, 0.0, 609.9802358809679,
+       0.0, 859.5612541049352, 381.65581881536707,
+       0.0, 0.0, 1.0]
+   # [k1, k2, p1, p2, k3] from the 2026-07-16 camera calibration.
+   camera_dist_coeffs: [-0.4316972497926334, 0.20620906785883605,
+                        -0.0005479271350894274, 0.0004412586303676002,
+                        -0.05145857724160855]
+   # Camera-to-IMU transform, composed from the existing LiDAR-camera
+   # calibration and the Avia-to-built-in-IMU translation.
+   camera_ext_R:
+      [0.022432420729120, -0.015347344039834, 0.999630554520597,
+       -0.999720343936701, 0.007141325603767, 0.022544076554761,
+       -0.007484678972252, -0.999856719985191, -0.015182854841510]
+   camera_ext_t: [-0.106514363944437, -0.065880929317533, 0.023206408754517]
+
+r3live_lio:
+   lio_update_point_step: 1
+   max_iteration: 2
+   lidar_time_delay: 0
+   filter_size_corner: 0.30
+   filter_size_surf: 0.30
+   filter_size_surf_z: 0.30
+   filter_size_map: 0.30
+   dense_map_enable: true
