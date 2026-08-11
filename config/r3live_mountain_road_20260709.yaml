@@ -5,6 +5,10 @@ Lidar_front_end:
    using_raw_point: 1
    point_step: 1
 
+evo:
+   pose_output_en: true
+   trajectory_path: "/home/gjm/mountain_road_20260709/r3live_output/r3live_trajectory.tum"
+
 r3live_common:
    if_dump_log: 0
    # MVS recording retains extra per-frame data and is not needed for the

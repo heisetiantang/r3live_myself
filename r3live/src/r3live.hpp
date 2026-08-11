@@ -51,6 +51,7 @@ Dr. Fu Zhang < fuzhang@hku.hk >.
 #include <math.h>
 #include <thread>
 #include <fstream>
+#include <iomanip>
 #include <csignal>
 #include <unistd.h>
 #include <so3_math.h>
@@ -133,6 +134,9 @@ public:
     std::string root_dir = ROOT_DIR;
     FILE * m_lio_state_fp;
     FILE * m_lio_costtime_fp;
+    bool m_evo_pose_output_en = false;
+    std::string m_evo_trajectory_path;
+    std::ofstream m_evo_trajectory_file;
     double m_maximum_pt_kdtree_dis = 1.0;
     double m_maximum_res_dis = 1.0;
     double m_planar_check_dis = 0.05;
@@ -357,6 +361,9 @@ public:
             scope_color( ANSI_COLOR_RED );
             get_ros_parameter( m_ros_node_handle, "r3live_common/map_output_dir", m_map_output_dir,
                                Common_tools::get_home_folder().append( "/r3live_output" ) );
+            get_ros_parameter( m_ros_node_handle, "evo/pose_output_en", m_evo_pose_output_en, false );
+            get_ros_parameter( m_ros_node_handle, "evo/trajectory_path", m_evo_trajectory_path,
+                               std::string( m_map_output_dir ).append( "/r3live_trajectory.tum" ) );
             get_ros_parameter( m_ros_node_handle, "r3live_common/append_global_map_point_step", m_append_global_map_point_step, 4 );
             get_ros_parameter( m_ros_node_handle, "r3live_common/recent_visited_voxel_activated_time", m_recent_visited_voxel_activated_time, 0.0 );
             get_ros_parameter( m_ros_node_handle, "r3live_common/maximum_image_buffer", m_maximum_image_buffer, 20000 );
@@ -402,6 +409,20 @@ public:
             cout << ANSI_COLOR_BLUE_BOLD << "Create r3live output dir: " << m_map_output_dir << ANSI_COLOR_RESET << endl;
             Common_tools::create_dir(m_map_output_dir);
         }
+        if ( m_evo_pose_output_en )
+        {
+            m_evo_trajectory_file.open( m_evo_trajectory_path.c_str(), std::ios::out );
+            if ( !m_evo_trajectory_file )
+            {
+                ROS_ERROR_STREAM( "Cannot open R3LIVE TUM output: " << m_evo_trajectory_path );
+                m_evo_pose_output_en = false;
+            }
+            else
+            {
+                m_evo_trajectory_file << std::fixed << std::setprecision( 9 );
+                ROS_INFO_STREAM( "R3LIVE TUM trajectory: " << m_evo_trajectory_path );
+            }
+        }
         m_thread_pool_ptr = std::make_shared<Common_tools::ThreadPool>(6, true, false); // At least 5 threads are needs, here we allocate 6 threads.
         g_cost_time_logger.init_log( std::string(m_map_output_dir).append("/cost_time_logger.log"));
         m_map_rgb_pts.set_minmum_dis(m_minumum_rgb_pts_size);
@@ -422,7 +443,13 @@ public:
         m_thread_pool_ptr->commit_task(&R3LIVE::service_LIO_update, this);
              
     }
-    ~R3LIVE(){};
+    ~R3LIVE()
+    {
+        if ( m_evo_trajectory_file.is_open() )
+        {
+            m_evo_trajectory_file.close();
+        }
+    };
 
     //project lidar frame to world
     void pointBodyToWorld(PointType const *const pi, PointType *const po);
